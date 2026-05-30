@@ -149,25 +149,29 @@ $city_name = $_GET["city"];
 
 <?php
 // پیدا کردن ID شهر بر اساس نام آن
-$sql = "SELECT id FROM reports_city WHERE name = '$city_name'";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
+$sql = "SELECT id FROM reports_city WHERE name = ?";
+$result = $pdo->prepare($sql);
+$result->execute([$city_name]);
+$row = $result->fetch();
 $city_id = $row["id"];
 
 // کوئری برای گرفتن تمام گزارش‌های تایید شده
 $sql_report = "SELECT display_name, text, created_at, category_id 
                FROM reports_report 
-               WHERE city_id = '$city_id' AND is_approved = 1 
+               WHERE city_id = ? AND is_approved = 1 
                ORDER BY created_at DESC";
-$result2 = $conn->query($sql_report);
 
-if ($result2 && $result2->num_rows > 0) {
-    // رندر کارت‌ها
-    while ($row2 = $result2->fetch_assoc()) {
+$result2 = $pdo->prepare($sql_report);
+$result2->execute([$city_id]);
+$rows2 = $result2->fetchAll();
+
+if ($result2 && count($rows2) > 0) {
+    foreach($rows2 as $row2) {
         $cat_id = $row2["category_id"];
-        $sql_cat = "SELECT icon, title FROM reports_category WHERE id = '$cat_id'";
-        $result3 = $conn->query($sql_cat);
-        $row3 = $result3->fetch_assoc();
+        $sql_cat = "SELECT icon, title FROM reports_category WHERE id = ?";
+        $result3 = $pdo->prepare($sql_cat);
+        $result3->execute([$cat_id]);
+        $row3 = $result3->fetch();
         $formatted_date = date("H:i | Y-m-d", strtotime($row2["created_at"]));
         ?>
         <div class="report-card">
@@ -196,7 +200,7 @@ if ($result2 && $result2->num_rows > 0) {
     echo "<script>window.location.href='index.php';</script>";
 }
 
-$conn->close();
+$pdo = null;
 ?>
 
 <div class="back-nav">
