@@ -3,12 +3,13 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "kbrcheen";
-$conn = new mysqli($servername, $username, $password, $dbname);
 
-if ($conn->connect_error) {
-    die("خطا در اتصال به دیتابیس کبرچین: " . $conn->connect_error);
+try {
+    $pdo = new PDO("mysql:host=$servername;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    die("خطا در اتصال به دیتابیس: ".$e->getMessage());
 }
-
-
 
 ?>

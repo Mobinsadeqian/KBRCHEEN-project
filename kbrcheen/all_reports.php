@@ -196,8 +196,8 @@
             <?php
             require_once 'config.php';
             $sql3 = "SELECT name FROM reports_state";
-            $result3 = $conn->query($sql3);
-            while($row3 = $result3->fetch_assoc()) {
+            $stmt3 = $pdo->query($sql3);
+            while($row3 = $stmt3->fetch()) {
                 $selected = (isset($_POST['state_name']) && $_POST['state_name'] == $row3['name']) ? 'selected' : '';
                 echo "<option value='".htmlspecialchars($row3['name'])."' $selected>".htmlspecialchars($row3["name"])."</option>";
             }
@@ -212,24 +212,33 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST["state_name"])) {
     $state_name = $_POST["state_name"];
     echo "<div class='section-title'>گزارش‌های استان: ".htmlspecialchars($state_name)."</div>";
 
-    $sql_s = "SELECT id FROM reports_state WHERE name = '$state_name'";
-    $result_s = $conn->query($sql_s);
-    $row_s = $result_s->fetch_assoc();
+    $sql_s = "SELECT id FROM reports_state WHERE name = ?";
+    $stmt_s = $pdo->prepare($sql_s);
+    $stmt_s->execute([$state_name]);
+    $row_s = $stmt_s->fetch();
     $state_id = $row_s["id"];
 
     // اضافه کردن متغیرهای دسته بندی و شهر برای رندر منظم کارت‌ها
-    $sql_r = "SELECT * FROM reports_report WHERE state_id = '$state_id' AND is_approved = 1 ORDER BY created_at DESC";
-    $result_r = $conn->query($sql_r);
+    $sql_r = "SELECT * FROM reports_report WHERE state_id = ? AND is_approved = 1 ORDER BY created_at DESC";
+    $stmt_r = $pdo->prepare($sql_r);
+    $stmt_r->execute([$state_id]);
+    $rows_r = $stmt_r->fetchAll();
 
-    if ($result_r && $result_r->num_rows > 0) {
-        while($row_r = $result_r->fetch_assoc()) {
+    if ($stmt_r && count($rows_r) > 0) {
+        foreach($rows_r as $row_r) {
             $city_id = $row_r["city_id"];
-            $sql_c = "SELECT name FROM reports_city WHERE id = '$city_id'";
-            $city_name = $conn->query($sql_c)->fetch_assoc()["name"];
+            $sql_c = "SELECT name FROM reports_city WHERE id = ";
+            $stmt_c = $pdo->prepare($sql_c);
+            $stmt_c->execute([$city_id]);
+            $row_c = $stmt_c->fetch();
+            $city_name = $row_c["name"];
+            
 
             $cat_id = $row_r["category_id"];
-            $sql_cat = "SELECT icon, title FROM reports_category WHERE id = '$cat_id'";
-            $row_cat = $conn->query($sql_cat)->fetch_assoc();
+            $sql_cat = "SELECT icon, title FROM reports_category WHERE id = ";
+            $stmt_cat = $pdo->prepare($sql_cat);
+            $stmt_cat->execute([$cat_id]);
+            $row_cat = $stmt_cat->fetch();
 
             $formatted_date = date("H:i | Y-m-d", strtotime($row_r["created_at"]));
             ?>
@@ -261,18 +270,24 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST["state_name"])) {
     echo "<div class='section-title'>آخرین گزارش‌های تایید شده سراسر کشور</div>";
     
     $sql = "SELECT * FROM reports_report WHERE is_approved = 1 ORDER BY created_at DESC";
-    $result = $conn->query($sql);
+    $result = $pdo->query($sql);
+    $rows = $result->fetchAll();
     
-    if ($result && $result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+    if ($result && count($rows) > 0) {
+        foreach($rows as $row) {
             $city_id = $row["city_id"];
-            $sql2 = "SELECT name FROM reports_city WHERE id = '$city_id'";
-            $row2 = $conn->query($sql2)->fetch_assoc();
+            $sql2 = "SELECT name FROM reports_city WHERE id = ?";
+            $stmt2 = $pdo->prepare($sql2);
+            $stmt2->execute([$city_id]);
+            $row2 = $stmt2->fetch();
             $city_name = $row2["name"];
 
             $cat_id = $row["category_id"];
-            $sql_cat = "SELECT icon, title FROM reports_category WHERE id = '$cat_id'";
-            $row_cat = $conn->query($sql_cat)->fetch_assoc();
+            $sql_cat = "SELECT icon, title FROM reports_category WHERE id = ?";
+            $stmt_cat = $pdo->prepare($sql_cat);
+            $stmt_cat->execute([$cat_id]);
+            $row_cat = $stmt_cat->fetch();
+            
 
             $formatted_date = date("H:i | Y-m-d", strtotime($row["created_at"]));
             ?>
@@ -298,7 +313,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_POST["state_name"])) {
         }
     }
 }
-$conn->close();
+
+$pdo = null;
 ?>
 
 <div class="back-nav">

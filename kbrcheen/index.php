@@ -191,8 +191,8 @@ require_once 'config.php';
                     <option value="">-- انتخاب استان --</option>
                     <?php
                     $sql = "SELECT name FROM reports_state";
-                    $result = $conn->query($sql);
-                    while($row = $result->fetch_assoc()) {
+                    $stmt = $pdo->query($sql);
+                    while($row = $stmt->fetch()) {
                         echo "<option value='".htmlspecialchars($row['name'])."'>".htmlspecialchars($row['name'])."</option>";
                     }
                     ?>

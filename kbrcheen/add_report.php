@@ -1,6 +1,7 @@
 <?php
 // انتقال کانفیگ به بالاترین خط برای حل مشکل عدم شناسایی متغیر دیتابیس در کدهای پایین
 require_once 'config.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -174,9 +175,10 @@ require_once 'config.php';
                 <select id="state-select" name="state" required>
                     <option value="">-- انتخاب استان --</option>
                     <?php
+                    /** @var PDO $pdo */
                     $sql = "SELECT name FROM reports_state";
-                    $result = $conn->query($sql);
-                    while($row = $result->fetch_assoc()) {
+                    $result = $pdo->query($sql);
+                    while($row = $result->fetch()) {
                         echo "<option value='".htmlspecialchars($row['name'])."'>".htmlspecialchars($row['name'])."</option>";
                     }
                     ?>
@@ -196,9 +198,9 @@ require_once 'config.php';
                     <option value="">-- انتخاب کنید --</option>
                     <?php
                     $sql = "SELECT title, icon FROM reports_category";
-                    $result2 = $conn->query($sql);
-                    while ($row2 = $result2->fetch_assoc()) {
-                        echo "<option value='".htmlspecialchars($row2['title'])."'>".htmlspecialchars($row2["title"])." ".htmlspecialchars($row2["icon"])."</option>";
+                    $result2 = $pdo->query($sql);
+                    while ($row2 = $result2->fetch()) {
+                        echo "<option value='".htmlspecialchars($row2['title'])."'>".htmlspecialchars($row2["title"])." ".$row2["icon"]."</option>";
                     }
                     ?>
                 </select>
