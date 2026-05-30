@@ -215,8 +215,6 @@ require_once 'config.php';
                 <label for="report_text">متن گزارش و جزئیات حادثه</label>
                 <textarea id="report_text" name="report_text" placeholder="گزارشتون رو اینجا به صورت واضح وارد کنید..." required></textarea>
             </div>
-
-            <input type="hidden" value="<?php echo date('Y-m-d H:i:s');?>" name="date">
             
             <button type="submit" class="btn-submit">ارسال گزارش برای بررسی</button>
         </form>

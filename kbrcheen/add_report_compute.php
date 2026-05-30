@@ -11,7 +11,7 @@
             $category_name = $_POST["category_name"];
             $display_name = $_POST["display_name"];
             $report_text = $_POST["report_text"];
-            $date = $_POST["date"];
+            $date = date('Y-m-d H:i:s');
             if (isset($city_name) and isset($category_name) and isset($display_name) and isset($report_text)) {
                 $sql = "SELECT id, state_id FROM reports_city WHERE name = ?";
                 $result = $pdo->prepare($sql);

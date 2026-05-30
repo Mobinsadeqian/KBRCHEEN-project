@@ -18,3 +18,4 @@ if (isset($_GET['state_name'])) {
     
     echo json_encode($cities, JSON_UNESCAPED_UNICODE);
 }
+?>
