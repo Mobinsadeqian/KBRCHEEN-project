@@ -137,11 +137,7 @@ kbrcheen/
 3. تغییرات را commit کنید: `git commit -m 'افزودن ویژگی جدید'`
 4. push کنید: `git push origin feature/ویژگی-جدید`
 5. یک Pull Request باز کنید
----
- 
-## 📜 مجوز
- 
-این پروژه تحت مجوز [MIT](LICENSE) منتشر شده است.
+---(LICENSE) منتشر شده است.
  
 ---
  
